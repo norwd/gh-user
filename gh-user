@@ -2,24 +2,38 @@
 
 set -e
 
+bold() {
+	if [ -x "$(command -v tput)" ]
+	then
+			tput bold
+	fi
+
+	echo "$@"
+
+	if [ -x "$(command -v tput)" ]
+	then
+		tput sgr0
+	fi
+}
+
 usage() {
 	case "$1" in
 		status)
 			echo "Work with GitHub User Statuses"
 			echo ""
-			echo "USAGE"
+			bold "USAGE"
 			echo "  gh user status [-h|--help]"
 			echo "  gh user status [-b|--busy] [-e|--emoji EMOJI] MESSAGE ..."
 			echo ""
-			echo "FLAGS"
+			bold "FLAGS"
 			echo "  -h, --help:           Show help for command"
 			echo "  -b, --busy:           Mark status as busy"
 			echo "  -e, --emoji EMOJI:    Set emoji for status"
 			echo ""
-			echo "ARGUMENTS"
+			bold "ARGUMENTS"
 			echo "  Trailing arguments are combined as the status message."
 			echo ""
-			echo "EXAMPLES"
+			bold "EXAMPLES"
 			echo "  $ gh user status Working on a PR"
 			echo "  $ gh user status -b --emoji :dart: \"Focusing\""
 			echo "  $ gh user status --busy=false --emoji=:video_game:"
@@ -29,17 +43,17 @@ usage() {
 		bio)
 			echo "Work with GitHub User Biography Descriptions"
 			echo ""
-			echo "USAGE"
+			bold "USAGE"
 			echo "  gh user bio [-h|--help]"
 			echo "  gh user bio MESSAGE ..."
 			echo ""
-			echo "FLAGS"
+			bold "FLAGS"
 			echo "  -h, --help:    Show help for command"
 			echo ""
-			echo "ARGUMENTS"
+			bold "ARGUMENTS"
 			echo "  Trailing arguments are combined as the bio message."
 			echo ""
-			echo "EXAMPLES"
+			bold "EXAMPLES"
 			echo "  $ gh user bio \"Hi! I'm Octocat :smile:\""
 			echo "  $ gh user bio \$(fortune -s)"
 			echo ""
@@ -48,22 +62,22 @@ usage() {
 		*)
 			echo "Work with GitHub User Profiles"
 			echo ""
-			echo "USAGE"
+			bold "USAGE"
 			echo "  gh user <command> [flags] [arguments ...]"
 			echo ""
-			echo "COMMANDS"
+			bold "COMMANDS"
 			echo "  help:      Show this message"
 			echo "  status:    Set user status emoji"
 			echo "  bio:       Set user bio/blurb"
 			echo ""
-			echo "FLAGS"
+			bold "FLAGS"
 			echo "  -h, --help:    Show help for command"
 			echo ""
-			echo "EXAMPLES"
+			bold "EXAMPLES"
 			echo "  $ gh user status -b --emoji :dart: \"Focusing\""
 			echo "  $ gh user bio \"Hi! I'm Octocat :smile:\""
 			echo ""
-			echo "LEARN MORE"
+			bold "LEARN MORE"
 			echo "  Use 'gh user <subcommand> --help' for more info"
 			echo ""
 		;;
