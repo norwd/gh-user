@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+
+set -e
+
+usage() {
+	case "$1" in
+		status)
+			echo "Work with GitHub User Statuses"
+			echo ""
+			echo "USAGE"
+			echo "  gh user status [-h|--help]"
+			echo "  gh user status [-b|--busy] [-e|--emoji EMOJI] MESSAGE ..."
+			echo ""
+			echo "FLAGS"
+			echo "  -h, --help:           Show help for command"
+			echo "  -b, --busy:           Mark status as busy"
+			echo "  -e, --emoji EMOJI:    Set emoji for status"
+			echo ""
+			echo "ARGUMENTS"
+			echo "  Trailing arguments are combined as the status message."
+			echo ""
+			echo "EXAMPLES"
+			echo "  $ gh user status Working on a PR"
+			echo "  $ gh user status -b --emoji :dart: \"Focusing\""
+			echo "  $ gh user status --busy=false --emoji=:video_game:"
+			echo ""
+		;;
+
+		bio)
+			echo "Work with GitHub User Biography Descriptions"
+			echo ""
+			echo "USAGE"
+			echo "  gh user bio [-h|--help]"
+			echo "  gh user bio MESSAGE ..."
+			echo ""
+			echo "FLAGS"
+			echo "  -h, --help:    Show help for command"
+			echo ""
+			echo "ARGUMENTS"
+			echo "  Trailing arguments are combined as the bio message."
+			echo ""
+			echo "EXAMPLES"
+			echo "  $ gh user bio \"Hi! I'm Octocat :smile:\""
+			echo "  $ gh user bio \$(fortune -s)"
+			echo ""
+		;;
+
+		*)
+			echo "Work with GitHub User Profiles"
+			echo ""
+			echo "USAGE"
+			echo "  gh user <command> [flags] [arguments ...]"
+			echo ""
+			echo "COMMANDS"
+			echo "  help:      Show this message"
+			echo "  status:    Set user status emoji"
+			echo "  bio:       Set user bio/blurb"
+			echo ""
+			echo "FLAGS"
+			echo "  -h, --help:    Show help for command"
+			echo ""
+			echo "EXAMPLES"
+			echo "  $ gh user status -b --emoji :dart: \"Focusing\""
+			echo "  $ gh user bio \"Hi! I'm Octocat :smile:\""
+			echo ""
+			echo "LEARN MORE"
+			echo "  Use 'gh user <subcommand> --help' for more info"
+			echo ""
+		;;
+	esac
+}
+
+err() {
+	if [ "${GITHUB_ACTIONS}" ]
+	then
+		echo "::error::$@"
+	else
+		echo "$@" 1>&2
+	fi
+}
+
+die() {
+	err "$@"
+	exit 1
+}
+
+main_status() {
+	busy=false
+
+	while [ "$#" -gt 0 ]
+	do
+		case "$1" in
+			-b | --busy  ) busy="true"       ; shift 1 ;;
+			--busy=*     ) busy="${1#*=}"    ; shift 1 ;;
+
+			-e | --emoji ) emoji="$2"        ; shift 2 ;;
+			--emoji=*    ) emoji="${1#*=}"   ; shift 1 ;;
+
+			-*           ) die "unknown option '$1'"   ;;
+			*            ) break                       ;;
+		esac
+	done
+
+	gh api graphql \
+		--silent \
+		-F emoji="$emoji" \
+		-F busy="$busy" \
+		-F message="$*" \
+		-f query='
+			mutation setUserStatus($emoji: String!, $message: String!, $busy: Boolean!) {
+				changeUserStatus(input: {emoji: $emoji, message: $message, limitedAvailability: $busy}) {
+					status {
+						emoji
+						message
+						indicatesLimitedAvailability
+					}
+				}
+			}
+		'
+}
+
+main_bio() {
+	gh api --silent /user -X PATCH -f bio="$*"
+}
+
+main() {
+	if [ "$#" -lt 1 ]
+	then
+		usage
+		exit 1
+	fi
+
+	COMMAND="$1"
+	shift
+
+	case "$COMMAND" in
+		-h | --help  ) usage                            ;;
+		help         ) usage "$1"                       ;;
+		status | bio ) main_$COMMAND $*                 ;;
+		*            ) die "unknown command '$COMMAND'" ;;
+	esac
+}
+
+main $@
+
