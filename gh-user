@@ -5,7 +5,7 @@ set -e
 bold() {
 	if [ -x "$(command -v tput)" ]
 	then
-			tput bold
+		tput bold
 	fi
 
 	echo "$@"
