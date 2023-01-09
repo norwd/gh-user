@@ -104,6 +104,8 @@ main_status() {
 	while [ "$#" -gt 0 ]
 	do
 		case "$1" in
+			-h | --help  ) usage status      ; exit  0 ;;
+
 			-b | --busy  ) busy="true"       ; shift 1 ;;
 			--busy=*     ) busy="${1#*=}"    ; shift 1 ;;
 
@@ -134,6 +136,13 @@ main_status() {
 }
 
 main_bio() {
+	while [ "$#" -gt 0 ]
+	do
+		case "$1" in
+			-h | --help ) usage status ; exit 0 ;;
+		esac
+	done
+
 	gh api --silent /user -X PATCH -f bio="$*"
 }
 
