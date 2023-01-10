@@ -139,7 +139,10 @@ main_bio() {
 	while [ "$#" -gt 0 ]
 	do
 		case "$1" in
-			-h | --help ) usage status ; exit 0 ;;
+			-h | --help ) usage status ; exit 0     ;;
+
+			-*          ) die "unknown option '$1'" ;;
+			*           ) break                     ;;
 		esac
 	done
 
