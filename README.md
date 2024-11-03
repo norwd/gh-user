@@ -2,7 +2,7 @@
 
 GitHub CLI User Management Extension
 
-<img src="https://humanmademark.com/automatic-logo.svg" height="50" />
+<img src="/../../../../norwd/human/blob/main/docs/automatic-logo.svg" height="50" />
 
 ## Installation
 
